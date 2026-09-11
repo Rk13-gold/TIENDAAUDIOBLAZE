@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Packs de audio de psicología en español. Calma real, en tu correo en minutos.">
+  <title>TiendaAudioBlaze — Packs de audio de psicología</title>
+
+  <!-- Tipografías: Fraunces (display) + Instrument Sans (cuerpo) desde Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- PayPal Smart Buttons (client-id público, SDK oficial) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=CLIENT_ID_PUBLICO_REEMPLAZAR&components=buttons&currency=EUR" data-sdk-integration-source="button-factory"></script>
+</head>
+<body>
+  <a class="visually-hidden" href="#comprar">Saltar al contenido principal</a>
+
+  <header class="site-header container" role="banner">
+    <p class="brand">TiendaAudioBlaze<small>audio de psicología</small></p>
+    <nav class="header-links" aria-label="Navegación principal">
+      <a href="#catalogo">Catálogo</a>
+      <a href="refunds.html">Reembolsos</a>
+    </nav>
+  </header>
+
+  <main id="contenido" role="main" class="container">
+
+    <!-- ==========================================================
+         HERO — composición del pack #1 (Pass 1)
+         marca → cubierta → título → promesa bajo el CTA → enlace
+         ========================================================== -->
+    <section class="hero" aria-labelledby="hero-titulo">
+      <div class="hero-copy">
+        <p class="eyebrow">Nuevo · Pack 01</p>
+        <h1 id="hero-titulo">La calma se entrena.<br>Empieza hoy.</h1>
+        <p class="lede">Sesiones guiadas en audio para bajar la ansiedad y dormir mejor. Nada de leer, solo escuchar. En tu correo en minutos.</p>
+
+        <!-- CTA principal: paga con PayPal (botón se monta aquí, ver app.js) -->
+        <section id="comprar" aria-labelledby="comprar-titulo">
+          <h2 id="comprar-titulo" class="visually-hidden">Comprar el Pack Ansiedad 01</h2>
+
+          <div id="pay-status" hidden aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            Procesando tu pago seguro…
+          </div>
+
+          <div id="paypal-button-container"></div>
+
+          <div id="pay-error" hidden role="alert">
+            No pudimos completar el pago. Vuelve a intentarlo o escríbenos a
+            <a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a>.
+          </div>
+
+          <!-- Micro-copia: promesa de entrega justo bajo el CTA (Pass 3) -->
+          <p class="promise">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Recibes el enlace del pack en tu correo al terminar.
+          </p>
+
+          <!-- Teléfono opcional (T3): no requerido para el pago -->
+          <div class="phone-field">
+            <label for="buyer-phone">Teléfono <span style="font-weight:400">(opcional)</span></label>
+            <input type="tel" id="buyer-phone" name="buyer_phone" autocomplete="tel"
+                   inputmode="tel" placeholder="+34 600 000 000">
+            <span class="hint">Solo lo usamos para contactarte si algo va mal con la entrega.</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="hero-pack">
+        <div class="cover-wrap">
+          <img src="assets/cover-ansiedad-01.svg" alt="Cubierta del Pack Ansiedad 01" width="640" height="800">
+        </div>
+        <p class="pack-price" id="hero-precio">— <small>impuestos incluidos</small></p>
+        <p class="pack-meta"><strong>Pack Ansiedad 01</strong> · 6 sesiones de audio · entrega en tu correo</p>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         CATÁLOGO COMPACTO (Pass 1) — lista desde Supabase (T5)
+         ========================================================== -->
+    <section id="catalogo" class="catalog" aria-labelledby="catalogo-titulo">
+      <h2 id="catalogo-titulo">Todos los packs</h2>
+
+      <!-- Esqueleto de carga (Pass 2): ningún estado vacío -->
+      <ul class="pack-list" id="pack-list" aria-label="Catálogo de packs">
+        <li class="pack-row" aria-hidden="true">
+          <span class="skeleton" style="width:64px;height:64px"></span>
+          <div class="row-info">
+            <div class="skeleton skeleton-line" style="max-width:220px;margin-bottom:6px"></div>
+            <div class="skeleton skeleton-line" style="max-width:140px"></div>
+          </div>
+          <span class="skeleton" style="width:60px;height:20px"></span>
+        </li>
+        <li class="pack-row" aria-hidden="true">
+          <span class="skeleton" style="width:64px;height:64px"></span>
+          <div class="row-info">
+            <div class="skeleton skeleton-line" style="max-width:180px;margin-bottom:6px"></div>
+            <div class="skeleton skeleton-line" style="max-width:120px"></div>
+          </div>
+          <span class="skeleton" style="width:60px;height:20px"></span>
+        </li>
+      </ul>
+
+      <div id="catalog-error" hidden role="alert">
+        No pudimos cargar el catálogo. <button class="btn btn-plan" id="retry-catalog" type="button">Reintentar</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>© 2026 TiendaAudioBlaze · <a href="refunds.html">Política de reembolso</a></p>
+      <p><a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

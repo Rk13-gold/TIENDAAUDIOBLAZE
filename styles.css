@@ -1,0 +1,421 @@
+/* ============================================================
+   TiendaAudioBlaze — styles.css
+   Dirección visual "Calma terrosa" (plan-design-review, Pass 4-6)
+
+   Tokens base en variables CSS (Pass 5). Sin sistema formal hasta
+   Fase 2 (TODO D1). Un solo movimiento autorizado: entrance ease-out.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Tokens (Pass 5) — paleta con hex (Pass 4)
+   ------------------------------------------------------------ */
+:root {
+  /* Paleta Calma terrosa */
+  --paper: #F5EFE3;          /* fondo » papel cream  */
+  --pine: #1F3D33;           /* verde-pino oscuro » texto fuerte/botones */
+  --terra: #C15837;          /* terracota » acento CTA/bordes/hover */
+  --ink: #2B2620;            /* tinta » texto principal */
+  --arena: #E4DAC8;          /* arena » líneas/divisores */
+  --muted: #7D7466;          /* atenuado » secundario/placeholder */
+
+  --surface: #FFFDF7;        /* tarjetas sobre papel */
+  --surface-muted: #EFE7D5;  /* superficies suaves (skeleton) */
+  --status-ok: #2E6B4F;
+  --status-err: #A0442F;
+  --focus-ring: #C15837;
+
+  /* Tipografía */
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Instrument Sans", "system-ui", sans-serif;
+  --fs-display: clamp(2.25rem, 6vw, 5.5rem);   /* display ≤6rem */
+  --fs-label: clamp(1.75rem, 4vw, 3rem);
+  --fs-h2: clamp(1.5rem, 3.5vw, 2.25rem);
+  --fs-body: 1rem;                              /* body ≥16px */
+  --fs-small: 0.9rem;
+  --fs-micro: 0.8rem;
+
+  /* Espaciado (escala 4/8/16/24/32) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
+
+  /* Radio (2–12px, no universal) */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+
+  /* Un movimiento (Pass 5) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-enter: 480ms var(--ease-out);
+  --motion-fade: 220ms ease-out;
+}
+
+/* Superficies del navegador tematizadas (Pass 4/6) */
+::selection {
+  background: var(--terra);
+  color: var(--paper);
+}
+html {
+  scrollbar-color: var(--terra) var(--paper);
+  scrollbar-width: thin;
+}
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
+* { box-sizing: border-box; }
+
+html { color-scheme: light; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(193, 88, 55, 0.07), transparent 42%),
+    radial-gradient(circle at 88% 4%, rgba(31, 61, 51, 0.08), transparent 46%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Grano de papel (Pass 4): textura sin gradientes */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.07  0 0 0 0.05 0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+.container {
+  width: min(100% - var(--sp-4) * 2, 960px);
+  margin-inline: auto;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap; overflow: hidden;
+}
+
+a { color: var(--pine); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--terra); }
+
+/* ------------------------------------------------------------
+   Cabecera
+   ------------------------------------------------------------ */
+.site-header {
+  padding: var(--sp-4) 0 var(--sp-2);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-label);
+  color: var(--pine);
+  letter-spacing: -0.01em;
+}
+.brand small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header-links { display: flex; gap: var(--sp-3); font-size: var(--fs-small); }
+
+/* ------------------------------------------------------------
+   Hero (Pass 1): asimetría + grid no simétrico
+   ------------------------------------------------------------ */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: var(--sp-5);
+  align-items: center;
+  padding: var(--sp-5) 0 var(--sp-5);
+}
+.hero-copy h1 {
+  margin: var(--sp-2) 0 var(--sp-3);
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: var(--fs-display);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--pine);
+}
+.hero-copy .eyebrow {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--terra);
+  font-weight: 600;
+}
+.hero-copy .lede {
+  font-size: calc(var(--fs-body) * 1.15);
+  color: var(--muted);
+  max-width: 46ch;
+  margin: 0 0 var(--sp-4);
+}
+.hero-pack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+/* Acento terracota: línea bajo la cubierta */
+.hero-pack .cover-wrap {
+  width: 100%;
+  max-width: 320px;
+  border-left: 3px solid var(--terra);
+  padding-left: var(--sp-3);
+}
+.hero-pack .pack-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  color: var(--pine);
+}
+.hero-pack .pack-price small {
+  font-family: var(--font-body);
+  font-size: var(--fs-micro);
+  color: var(--muted);
+  font-weight: 400;
+}
+.hero-pack .pack-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+
+/* ------------------------------------------------------------
+   Botones y CTA
+   ------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: 14px 22px;               /* ≥48px touch (Pass 6) */
+  min-height: 48px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform var(--motion-fade), background var(--motion-fade);
+}
+.btn-primary {
+  background: var(--pine);
+  color: var(--paper);
+}
+.btn-primary:hover { background: #163129; transform: translateY(-1px); }
+.btn-primary:disabled {
+  background: var(--surface-muted);
+  color: var(--muted);
+  cursor: wait;
+}
+.btn-plan { background: var(--terra); color: var(--paper); }
+.btn-plan:hover { background: #a84a2d; transform: translateY(-1px); }
+
+/* Promesa bajo el CTA (Pass 3 — micro-copia) */
+.promise {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.promise svg { flex: none; }
+
+/* ------------------------------------------------------------
+   Catálogo compacto (Pass 1 — lista, no tarjetas)
+   ------------------------------------------------------------ */
+.catalog { padding: var(--sp-4) 0 var(--sp-5); }
+.catalog h2 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: var(--fs-h2);
+  color: var(--pine);
+  margin: 0 0 var(--sp-4);
+}
+.pack-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+.pack-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--arena);
+  border-radius: var(--radius-md);
+}
+.pack-row img {
+  width: 64px; height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+.pack-row .row-info { flex: 1; min-width: 0; }
+.pack-row .row-name { font-weight: 600; color: var(--ink); }
+.pack-row .row-desc {
+  margin: 2px 0 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+.pack-row .row-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--pine);
+  white-space: nowrap;
+}
+
+/* Esqueletos de carga (Pass 2 — sin estados vacíos) */
+.skeleton {
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.55; } }
+.skeleton-line { height: 18px; width: 100%; }
+
+/* ------------------------------------------------------------
+   Estado del pago (Pass 2)
+   ------------------------------------------------------------ */
+#pay-error {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  border-left: 3px solid var(--status-err);
+  background: rgba(160, 68, 47, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--status-err);
+}
+#pay-error[hidden] { display: none; }
+#pay-error a { color: var(--status-err); font-weight: 600; }
+
+#pay-status[hidden] { display: none; }
+#pay-status .spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid var(--arena);
+  border-top-color: var(--pine);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: -3px;
+  margin-right: var(--sp-2);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#pay-status { color: var(--pine); font-weight: 600; }
+
+/* ------------------------------------------------------------
+   Pie
+   ------------------------------------------------------------ */
+.site-footer {
+  padding: var(--sp-4) 0 var(--sp-5);
+  border-top: 1px solid var(--arena);
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+.site-footer .container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: space-between;
+}
+
+/* ------------------------------------------------------------
+   Checkout del teléfono (T3, opcional)
+   ------------------------------------------------------------ */
+.phone-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: var(--sp-3) 0;
+  max-width: 320px;
+}
+.phone-field label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink);
+}
+.phone-field input {
+  padding: 12px 14px;
+  min-height: 48px;
+  border: 1px solid var(--arena);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+}
+.phone-field input:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.phone-field .hint { font-size: var(--fs-micro); color: var(--muted); }
+
+/* Botón PayPal: contenedor seguro (el iframe mide alturas) */
+#paypal-button-container { margin-top: var(--sp-2); }
+
+/* ------------------------------------------------------------
+   Responsive (Pass 6): columna única + CTA sticky en móvil
+   ------------------------------------------------------------ */
+@media (max-width: 720px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  .hero-pack .cover-wrap { max-width: 100%; }
+
+  /* Panel de compra accesible al hacer scroll (Pass 1).
+     Nota: NO se duplica el iframe de PayPal (un solo mount del botón);
+     por eso el sticky es del panel #comprar completo, no del botón. */
+  #comprar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    background: var(--paper);
+    padding: var(--sp-3) var(--sp-3) max(var(--sp-3), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--arena);
+    box-shadow: 0 -6px 24px rgba(43, 38, 32, 0.08);
+  }
+  #comprar .phone-field { display: none; } /* el teléfono opcional no viaja en el sticky */
+  .pack-row { flex-wrap: wrap; }
+  .pack-row .row-price { width: 100%; }
+}
+
+/* ------------------------------------------------------------
+   Motion: respeto a prefers-reduced-motion (Pass 6)
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

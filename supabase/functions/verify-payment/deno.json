@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window", "deno.ns"]
+  },
+  "tasks": {
+    "check": "deno check index.ts orders.ts paypal.ts telegram.ts",
+    "test": "deno test --allow-env --allow-net tests/"
+  }
+}
