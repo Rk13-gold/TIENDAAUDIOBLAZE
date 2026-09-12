@@ -12,9 +12,9 @@
 // --- Configuración (reemplazar por los valores del proyecto) -------------
 // La anon key es pública por diseño; el service-role/key secreta NO va aquí.
 const CONFIG = {
-  SUPABASE_URL: 'https://TU-PROYECTO.supabase.co',
-  SUPABASE_ANON_KEY: 'ANON_KEY_PUBLICA',
-  EDGE_FUNCTION_URL: 'https://TU-PROYECTO.functions.supabase.co/verify-payment',
+  SUPABASE_URL: 'https://kxlbpxprtgupvzyxsuxn.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4bGJweHBydGd1cHZ6eXhzdXhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNTU5NjUsImV4cCI6MjEwNDczMTk2NX0.8wVhispADrPXOSguiyFuWttUOflm5gULpoPO-fKoTM4',
+  EDGE_FUNCTION_URL: 'https://kxlbpxprtgupvzyxsuxn.functions.supabase.co/verify-payment',
   CURRENCY: 'USD',                    // moneda de la tienda (precios en $)
   // Tiempo máximo de espera de la Edge Function antes de mostrar error.
   EDGE_TIMEOUT_MS: 15000,
