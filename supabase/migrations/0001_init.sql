@@ -48,6 +48,9 @@ alter table public.packs  enable row level security;
 alter table public.orders enable row level security;
 
 -- El catálogo es público de solo lectura (solo packs activos).
+-- Las policies no admiten IF NOT EXISTS: se dropean primero para que la
+-- migración sea re-ejecutable (db push / reset con la tabla ya creada).
+drop policy if exists "packs_public_read" on public.packs;
 create policy "packs_public_read"
   on public.packs for select
   to anon, authenticated
