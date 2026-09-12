@@ -188,7 +188,14 @@ async function submitOrderToEdge(orderId, buyerPhone) {
   try {
     const res = await fetch(CONFIG.EDGE_FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        // La función verifica JWT por defecto; la anon key es pública y nos
+        // autentica ante el edge runtime (el poder de insertar órdenes no
+        // depende de esto: lo hace la service-role server-side).
+        apikey: CONFIG.SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
+      },
       body: JSON.stringify({ order_id: orderId, buyer_phone: buyerPhone || null }),
       signal: controller.signal,
     });
