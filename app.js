@@ -15,16 +15,35 @@ const CONFIG = {
   SUPABASE_URL: 'https://TU-PROYECTO.supabase.co',
   SUPABASE_ANON_KEY: 'ANON_KEY_PUBLICA',
   EDGE_FUNCTION_URL: 'https://TU-PROYECTO.functions.supabase.co/verify-payment',
-  CURRENCY: 'EUR',
+  CURRENCY: 'USD',                    // moneda de la tienda (precios en $)
   // Tiempo máximo de espera de la Edge Function antes de mostrar error.
   EDGE_TIMEOUT_MS: 15000,
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
-const money = (cents, currency) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: currency || CONFIG.CURRENCY })
+const money = (cents, currency) => {
+  const cur = currency || CONFIG.CURRENCY;
+  // USD → "$27.00" (formato en-US); otras divisas → formato local.
+  const locale = cur === 'USD' ? 'en-US' : 'es-ES';
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: cur })
     .format((cents || 0) / 100);
+};
+
+// --- Modo demo (local, sin Supabase/PayPal reales) --------------------------
+// Se activa automáticamente si la carga del catálogo falla (placeholder) o si
+// el SDK de PayPal no monta. Permite ver el diseño completo y simular el pago.
+const DEMO = {
+  packs: [
+    {
+      id: 'ansiedad-01',
+      name: 'Pack Ansiedad 01',
+      description: '6 sesiones guiadas para bajar la ansiedad y dormir mejor. Solo escuchar.',
+      price_cents: 2700,        // 27,00 $
+      currency: 'USD',
+    },
+  ],
+};
 
 const state = {
   packs: [],
@@ -109,8 +128,37 @@ async function initCatalog() {
     renderHero(state.primary);
     errBox.hidden = true;
   } catch (e) {
-    console.error('[catalogo]', e);
-    errBox.hidden = false; // estado de error con reintento (Pass 2)
+    console.warn('[catalogo] carga real falló; modo demo', e);
+    // Modo demo: el front se ve completo aunque no haya Supabase configurado.
+    state.packs = DEMO.packs;
+    state.primary = DEMO.packs[0];
+    renderCatalog(DEMO.packs);
+    renderHero(DEMO.packs[0]);
+    errBox.hidden = true;
+  }
+}
+
+/* Botón simulado para el modo demo (mismo lenguaje visual que el CTA). */
+function renderDemoButton() {
+  const holder = $('#paypal-button-container');
+  if (!holder) return;
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-primary';
+  btn.type = 'button';
+  btn.textContent = 'Comprar el pack (demo) · $27.00';
+  btn.addEventListener('click', () => {
+    // Simula el onApprove real: spinner, espera breve y redirige a gracias.
+    setSubmitting(true);
+    $('#pay-error').hidden = true;
+    setTimeout(() => { window.location.href = 'gracias.html'; }, 900);
+  });
+  holder.append(btn);
+  if (typeof paypal === 'undefined') {
+    // Si no hay SDK, añadimos una nota de que es demo.
+    const note = document.createElement('p');
+    note.className = 'promise';
+    note.textContent = 'Modo demo: no se cobra nada.';
+    holder.after(note);
   }
 }
 
@@ -157,8 +205,10 @@ async function submitOrderToEdge(orderId, buyerPhone) {
    ------------------------------------------------------------ */
 function initPayPal() {
   if (typeof paypal === 'undefined') {
-    console.error('PayPal SDK no cargado');
-    showPayError();
+    // Sin SDK (client-id placeholder): modo demo, botón simulado.
+    console.warn('PayPal SDK no cargado → modo demo');
+    $('#pay-error').hidden = true;
+    renderDemoButton();
     return;
   }
 
@@ -208,8 +258,10 @@ function initPayPal() {
   }).render('#paypal-button-container')
     .catch((err) => {
       // client-id inválido / SDK caído: nunca un botón fantasma en silencio.
-      console.error('[paypal render]', err);
-      showPayError();
+      // En modo demo local cae a un botón simulado con el mismo flujo.
+      console.warn('[paypal render]', err, '→ botón demo');
+      $('#pay-error').hidden = true;
+      renderDemoButton();
     });
 }
 

@@ -18,13 +18,13 @@ sandbox (TODO T2).
 - `app.js` apuntando a `SUPABASE_URL`, la anon key y la URL de la función.
 
 ## 1. Pre-condiciones en la BD
-- [ ] `packs` contiene el pack `ansiedad-01` con `price_cents=2700`, `currency=EUR`.
+- [ ] `packs` contiene el pack `ansiedad-01` con `price_cents=2700`, `currency=USD`.
 - [ ] `orders` vacía (o con la fila esperada del test).
 - [ ] El bot de Telegram responde (manda `/start` al bot).
 
 ## 2. Flujo feliz (happy path)
 1. [ ] Abre la landing → el catálogo se carga desde Supabase (no hardcode).
-2. [ ] El hero muestra el precio **27,00 €** y «impuestos incluidos».
+2. [ ] El hero muestra el precio **$27.00** y «impuestos incluidos».
 3. [ ] Pulsa el botón PayPal → approve la orden en el sandbox (paga con el
       comprador de prueba).
 4. [ ] Aparece el spinner «Procesando tu pago seguro…» y el botón se deshabilita
@@ -32,7 +32,7 @@ sandbox (TODO T2).
 5. [ ] En unos segundos redirige a `gracias.html`.
 6. [ ] En la tabla `orders` hay **una** fila nueva con:
       `buyer_email` = email del payer (no del formulario), `status=completed`,
-      `notify_status=sent`, `amount_cents=2700`.
+      `notify_status=sent`, `amount_cents=2700` (27,00 $).
 7. [ ] El bot de Telegram notifica con nombre, email, teléfono, pack e importe.
 8. [ ] En Supabase, genera el enlace firmado del pack y verifica que se descarga.
 

@@ -12,7 +12,7 @@ create table if not exists public.packs (
   description  text,
   cover_path   text,                             -- Fase 2: objeto en el bucket 'covers'
   price_cents  integer not null check (price_cents > 0),
-  currency     text not null default 'EUR',
+  currency     text not null default 'USD',
   sort_order   integer not null default 100,
   active       boolean not null default true,
   created_at   timestamptz not null default now()
@@ -68,8 +68,8 @@ values (
   'Pack Ansiedad 01',
   '6 sesiones guiadas para bajar la ansiedad y dormir mejor. Solo escuchar.',
   null,
-  2700,
-  'EUR',
+  2700,                          -- 27,00 $ (precios en dólares)
+  'USD',
   1
 )
 on conflict (id) do nothing;

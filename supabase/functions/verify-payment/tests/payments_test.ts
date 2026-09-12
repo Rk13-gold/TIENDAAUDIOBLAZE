@@ -45,7 +45,7 @@ function approvedOrder(packId = 'ansiedad-01', value = '27.00'): Record<string, 
   return {
     id: 'ORDER-1',
     status: 'APPROVED',
-    purchase_units: [{ reference_id: packId, amount: { currency_code: 'EUR', value } }],
+    purchase_units: [{ reference_id: packId, amount: { currency_code: 'USD', value } }],
     payer: { email_address: 'comprador@ejemplo.com', name: { given_name: 'Ana', surname: 'Pérez' } },
   };
 }
@@ -82,8 +82,8 @@ Deno.test({
   fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
-      if (url.includes('/v2/checkout/orders/')) return okJson({ ...approvedOrder('ansiedad-01', '1.00') }); // 1€ ≠ 27€
-      return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/v2/checkout/orders/')) return okJson({ ...approvedOrder('ansiedad-01', '1.00') }); // $1 ≠ $27
+      return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
     });
     const res = await handler(new Request('https://fn', { method: 'POST', body: JSON.stringify({ order_id: 'X' }) }));
     assertEquals(res.status, 400);
@@ -136,7 +136,7 @@ Deno.test({
         return new Response(JSON.stringify({ id: 'ORDER-1', status: 'COMPLETED' }), { status: 201 });
       }
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder());
-      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
       if (url.includes('/rest/v1/orders') && url.includes('paypal_order_id=')) return okJson({}); // PATCH notify_status
       if (url.includes('/rest/v1/orders')) return new Response(JSON.stringify([{ id: 'uuid' }]), { status: 201 }); // INSERT
       if (url.includes('api.telegram.org')) { notifyCalled = true; return okJson({ ok: true }); }
@@ -162,7 +162,7 @@ Deno.test({
         return new Response(JSON.stringify({ details: [{ issue: 'ORDER_ALREADY_CAPTURED' }] }), { status: 422 });
       }
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder());
-      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
       if (url.includes('/rest/v1/orders') && url.includes('paypal_order_id=')) return okJson({}); // PATCH
       if (url.includes('/rest/v1/orders')) return new Response('already exists', { status: 409 }); // INSERT duplicado
       return okJson({});
@@ -182,7 +182,7 @@ Deno.test({
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/') && url.endsWith('/capture')) return new Response('{}', { status: 201 });
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder());
-      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
       if (url.includes('/rest/v1/orders')) return new Response('already exists', { status: 409 });
       if (url.includes('api.telegram.org')) { notifyCount += 1; return okJson({ ok: true }); }
       if (url.includes('/rest/v1/orders') && captured.at(-1)?.init?.method === 'PATCH') return okJson({});
@@ -203,7 +203,7 @@ Deno.test({
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/') && url.endsWith('/capture')) return new Response('{}', { status: 201 });
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder());
-      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
       if (url.includes('/rest/v1/orders')) return new Response('[]', { status: 201 });
       if (url.includes('api.telegram.org')) return new Response('gone', { status: 500 });
       return okJson({});
@@ -225,7 +225,7 @@ Deno.test({
       if (url.includes('/v1/oauth2/token')) { oauthCalls += 1; return okJson({ access_token: 't', expires_in: 3500 }); }
       if (url.includes('/v2/checkout/orders/') && url.endsWith('/capture')) return new Response('{}', { status: 201 });
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder());
-      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'EUR' }]);
+      if (url.includes('/rest/v1/packs')) return okJson([{ id: 'ansiedad-01', name: 'Pack Ansiedad 01', price_cents: 2700, currency: 'USD' }]);
       if (url.includes('/rest/v1/orders')) return new Response('[]', { status: 201 });
       if (url.includes('api.telegram.org')) return okJson({ ok: true });
       return okJson({});

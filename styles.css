@@ -10,19 +10,22 @@
    Tokens (Pass 5) — paleta con hex (Pass 4)
    ------------------------------------------------------------ */
 :root {
-  /* Paleta Calma terrosa */
-  --paper: #F5EFE3;          /* fondo » papel cream  */
-  --pine: #1F3D33;           /* verde-pino oscuro » texto fuerte/botones */
-  --terra: #C15837;          /* terracota » acento CTA/bordes/hover */
-  --ink: #2B2620;            /* tinta » texto principal */
-  --arena: #E4DAC8;          /* arena » líneas/divisores */
-  --muted: #7D7466;          /* atenuado » secundario/placeholder */
+  /* Paleta "Nocturno & Rojo" (2026-09-11, cambio de estilo del fundador)
+     fondo negro · rojo de marca (logo) · textos blancos · acento gris ·
+     precios en verde (misterio: negro+rojo+gris, verde solo en precios/éxito) */
+  --paper: #0B0B0D;          /* fondo » negro profundo */
+  --pine: #E11D2E;           /* rojo de marca (logo) » botones/CTA fuerte */
+  --terra: #C2C2C8;          /* gris neutro claro » acento/eyebrow/hover */
+  --ink: #F5F5F6;            /* blanco » texto principal */
+  --arena: #2A2A2E;          /* línea » divisores sobre negro */
+  --muted: #B3B3B8;          /* atenuado » secundario/placeholder */
+  --price: #3DDC85;          /* verde » precios (y estados de éxito) */
 
-  --surface: #FFFDF7;        /* tarjetas sobre papel */
-  --surface-muted: #EFE7D5;  /* superficies suaves (skeleton) */
-  --status-ok: #2E6B4F;
-  --status-err: #A0442F;
-  --focus-ring: #C15837;
+  --surface: #1A1A1E;        /* tarjetas sobre negro */
+  --surface-muted: #26262C;  /* superficies suaves (skeleton) */
+  --status-ok: #3DDC85;
+  --status-err: #FF4D4D;
+  --focus-ring: #E2E2E6;
 
   /* Tipografía */
   --font-display: "Fraunces", "Georgia", serif;
@@ -72,13 +75,20 @@ html {
    ------------------------------------------------------------ */
 * { box-sizing: border-box; }
 
-html { color-scheme: light; }
+img { max-width: 100%; height: auto; }
+
+html {
+  color-scheme: dark;
+  overflow-x: clip;            /* sin scroll lateral en ninguna pantalla */
+}
 
 body {
   margin: 0;
+  overflow-x: clip;            /* blindaje: nada desborda el viewport */
   background:
-    radial-gradient(circle at 12% 8%, rgba(193, 88, 55, 0.07), transparent 42%),
-    radial-gradient(circle at 88% 4%, rgba(31, 61, 51, 0.08), transparent 46%),
+    radial-gradient(circle at 12% 8%, rgba(225, 29, 46, 0.12), transparent 44%),
+    radial-gradient(circle at 88% 4%, rgba(194, 194, 200, 0.06), transparent 46%),
+    radial-gradient(circle at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
     var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
@@ -88,20 +98,22 @@ body {
   min-height: 100vh;
 }
 
-/* Grano de papel (Pass 4): textura sin gradientes */
+/* Grano sutil sobre negro: textura sin gradientes */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.07  0 0 0 0.05 0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  opacity: 0.15;
+  mix-blend-mode: screen;
 }
 
 .container {
-  width: min(100% - var(--sp-4) * 2, 960px);
+  width: 100%;
+  max-width: 960px;
   margin-inline: auto;
+  padding-inline: var(--sp-4);
 }
 
 .visually-hidden {
@@ -121,19 +133,35 @@ a:hover { color: var(--terra); }
 .site-header {
   padding: var(--sp-4) 0 var(--sp-2);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--sp-3);
+  gap: var(--sp-3) var(--sp-4);
+  flex-wrap: wrap;             /* en pantallas estrechas el nav baja de línea */
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--fs-label);
   color: var(--pine);
   letter-spacing: -0.01em;
+  margin: 0;
+}
+.brand img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.brand .brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
 }
 .brand small {
-  display: block;
   font-family: var(--font-body);
   font-weight: 400;
   font-size: var(--fs-micro);
@@ -141,7 +169,25 @@ a:hover { color: var(--terra); }
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.header-links { display: flex; gap: var(--sp-3); font-size: var(--fs-small); }
+.header-links {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: center;
+}
+.header-links a {
+  font-size: 1.15rem;           /* más grande que el cuerpo */
+  font-weight: 700;             /* negrita */
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 4px 8px;
+}
+.header-links a:hover {
+  color: var(--terra);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
 
 /* ------------------------------------------------------------
    Hero (Pass 1): asimetría + grid no simétrico
@@ -161,6 +207,7 @@ a:hover { color: var(--terra); }
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--pine);
+  text-shadow: 0 0 34px rgba(225, 29, 46, 0.18);  /* resplandor tenue: misterio */
 }
 .hero-copy .eyebrow {
   font-size: var(--fs-micro);
@@ -192,7 +239,7 @@ a:hover { color: var(--terra); }
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--fs-h2);
-  color: var(--pine);
+  color: var(--price);          /* verde: el precio es la única pieza en color vivo */
 }
 .hero-pack .pack-price small {
   font-family: var(--font-body);
@@ -227,15 +274,21 @@ a:hover { color: var(--terra); }
 .btn-primary {
   background: var(--pine);
   color: var(--paper);
+  box-shadow: 0 0 22px rgba(225, 29, 46, 0.30);   /* glow rojo: misterio */
 }
-.btn-primary:hover { background: #163129; transform: translateY(-1px); }
+.btn-primary:hover {
+  background: #C21022;
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(225, 29, 46, 0.45);
+}
 .btn-primary:disabled {
   background: var(--surface-muted);
   color: var(--muted);
   cursor: wait;
+  box-shadow: none;
 }
-.btn-plan { background: var(--terra); color: var(--paper); }
-.btn-plan:hover { background: #a84a2d; transform: translateY(-1px); }
+.btn-plan { background: var(--terra); color: #151518; font-weight: 700; }
+.btn-plan:hover { background: #D8D8DE; transform: translateY(-1px); }
 
 /* Promesa bajo el CTA (Pass 3 — micro-copia) */
 .promise {
@@ -291,7 +344,7 @@ a:hover { color: var(--terra); }
 .pack-row .row-price {
   font-family: var(--font-display);
   font-weight: 600;
-  color: var(--pine);
+  color: var(--price);          /* mismo verde que el precio del hero */
   white-space: nowrap;
 }
 
@@ -311,7 +364,7 @@ a:hover { color: var(--terra); }
   margin-top: var(--sp-3);
   padding: var(--sp-3);
   border-left: 3px solid var(--status-err);
-  background: rgba(160, 68, 47, 0.08);
+  background: rgba(255, 77, 77, 0.10);
   border-radius: var(--radius-sm);
   color: var(--status-err);
 }
@@ -386,6 +439,8 @@ a:hover { color: var(--terra); }
    Responsive (Pass 6): columna única + CTA sticky en móvil
    ------------------------------------------------------------ */
 @media (max-width: 720px) {
+  .container { padding-inline: var(--sp-3); }  /* más margen útil en móvil */
+  .header-links { flex-wrap: wrap; gap: var(--sp-2) var(--sp-3); }
   .hero {
     grid-template-columns: 1fr;
     gap: var(--sp-4);
@@ -399,10 +454,11 @@ a:hover { color: var(--terra); }
     position: sticky;
     bottom: 0;
     z-index: 20;
-    background: var(--paper);
+    background: rgba(11, 11, 13, 0.94);
+    backdrop-filter: blur(6px);
     padding: var(--sp-3) var(--sp-3) max(var(--sp-3), env(safe-area-inset-bottom));
     border-top: 1px solid var(--arena);
-    box-shadow: 0 -6px 24px rgba(43, 38, 32, 0.08);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45);
   }
   #comprar .phone-field { display: none; } /* el teléfono opcional no viaja en el sticky */
   .pack-row { flex-wrap: wrap; }
