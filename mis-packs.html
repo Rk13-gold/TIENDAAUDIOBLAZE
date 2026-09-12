@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="robots" content="noindex">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Tus packs de audio comprados en TiendaAudioBlaze.">
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <title>Gracias — TiendaAudioBlaze</title>
+  <title>Mis packs — TiendaAudioBlaze</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -18,30 +19,23 @@
       <span class="brand-text">TiendaAudioBlaze<small>audio de psicología</small></span>
     </p>
     <nav class="header-links" aria-label="Navegación principal">
+      <a href="index.html#catalogo">Catálogo</a>
       <a href="mis-packs.html">Mis packs</a>
       <span class="auth-nav" id="auth-nav"></span>
     </nav>
   </header>
 
-  <main role="main" class="container" style="max-width:640px; padding:var(--sp-5) 0">
-    <p class="eyebrow" style="color:var(--terra);font-size:var(--fs-micro);letter-spacing:.14em;text-transform:uppercase;font-weight:600">Pago recibido</p>
-    <h1 style="font-family:var(--font-display);color:var(--pine);font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:var(--sp-2) 0 var(--sp-3)">Gracias. Ya casi lo tienes.</h1>
-
-    <!-- Micro-copia del journey (Pass 3): instrucción clara post-pago -->
-    <p style="font-size:1.1rem;color:var(--muted)">
-      Te enviamos el <strong>enlace de descarga del pack a tu correo electrónico</strong>.
-      Revisa tu bandeja de entrada (y la carpeta de spam) en unos minutos.
-    </p>
-
-    <div style="margin:var(--sp-4) 0;padding:var(--sp-3);border-left:3px solid var(--terra);background:var(--surface);border-radius:var(--radius-sm)">
-      <p style="margin:0;color:var(--ink)">
-        ¿No llega en 30 minutos? Escríbenos a
-        <a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a>
-        con el email con el que pagaste y te lo enviamos a mano.
+  <main role="main" class="container">
+    <section class="auth-section" aria-labelledby="mis-packs-titulo" style="max-width:680px">
+      <h1 id="mis-packs-titulo" style="font-family:var(--font-display);font-weight:560;font-size:var(--fs-label);color:var(--pine);margin:0 0 var(--sp-2)">Mis packs</h1>
+      <p style="color:var(--muted);font-size:var(--fs-small);margin:0 0 var(--sp-3)">
+        Los packs que compraste con esta cuenta. El enlace de descarga llega a tu correo; si no lo ves, escríbenos.
       </p>
-    </div>
 
-    <p><a class="btn btn-primary" href="index.html">Volver a la tienda</a></p>
+      <div id="mis-packs">
+        <p class="promise">Cargando tus packs…</p>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer" role="contentinfo">
@@ -50,5 +44,7 @@
       <p><a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a></p>
     </div>
   </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

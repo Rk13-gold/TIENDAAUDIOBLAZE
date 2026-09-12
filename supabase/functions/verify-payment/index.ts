@@ -38,9 +38,43 @@ interface Payload {
   buyer_phone?: string | null;
 }
 
+// --- JWT del comprador (identidad en Supabase Auth) -------------------------
+// El gateway ya verifica la firma (verify_jwt:true). Aquí solo decodificamos
+// el payload para sacar el `sub` (user_id) y exigir que sea un UUID real.
+// El Bearer ANON (sin sub) queda rechazado a propósito: comprar exige cuenta.
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/') +
+      '='.repeat((4 - (part.length % 4)) % 4);
+    const bin = atob(b64);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes)) as Record<string, unknown>;
+  } catch {
+    return null; // JWT mal formado -> equivalen a sin identidad
+  }
+}
+
+/** user_id del Bearer, o null si falta / no es un UUID -> 401. */
+function extractUserId(req: Request): string | null {
+  const auth = req.headers.get('authorization') ?? '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  const payload = token ? decodeJwtPayload(token) : null;
+  const sub = payload?.sub;
+  return typeof sub === 'string' && UUID_RE.test(sub) ? sub : null;
+}
+
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { status: 204, headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
+
+  // Compra SOLO con cuenta: sin JWT de usuario válido -> 401.
+  const userId = extractUserId(req);
+  if (!userId) return json({ error: 'Autenticación requerida' }, 401);
 
   let payload: Payload;
   try {
@@ -96,6 +130,7 @@ export default async function handler(req: Request): Promise<Response> {
 
     // 5. Insertar la fila (idempotente). Reintento -> ya existe -> no re-notificar.
     const row: NewOrder = {
+      user_id: userId,
       paypal_order_id: orderId,
       pack_id: packId,
       buyer_name: payerName(order),

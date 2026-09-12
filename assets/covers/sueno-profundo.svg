@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" role="img"
+     aria-labelledby="title desc" preserveAspectRatio="xMidYMid meet">
+  <title id="title">Pack Sueño Profundo — Soltar el día. Dormir de un tirón.</title>
+  <desc id="desc">Cubierta en negro profundo con luna y silueta nocturna en rojo de marca y acento gris.</desc>
+
+  <!-- Fondo negro profundo -->
+  <rect width="640" height="800" fill="#0B0B0D"/>
+
+  <!-- Grano sutil (textura generativa, sin asset externo) -->
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11"/>
+    <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.045 0"/>
+  </filter>
+  <rect width="640" height="800" filter="url(#grain)" opacity="0.6" style="mix-blend-mode: screen;"/>
+
+  <!-- Marco interior en gris oscuro -->
+  <rect x="40" y="40" width="560" height="720" fill="none"
+        stroke="#2A2A2E" stroke-width="2"/>
+
+  <!-- Noche en rojo de marca: silueta de cama-ondulación -->
+  <path d="M60 580 C 170 520, 260 620, 380 560
+           C 470 514, 540 570, 600 520
+           L 600 760 L 60 760 Z"
+        fill="#E11D2E" opacity="0.92"/>
+
+  <!-- Luna creciente en gris -->
+  <path d="M430 190 A 58 58 0 1 0 512 262 A 46 46 0 1 1 430 190 Z"
+        fill="#C2C2C8" opacity="0.95"/>
+  <circle cx="470" cy="250" r="120" fill="none" stroke="#C2C2C8" stroke-width="1" opacity="0.30"/>
+
+  <!-- Ondas del sueño en gris -->
+  <path d="M60 660 C 160 620, 240 700, 340 660
+           C 420 630, 520 680, 600 642"
+        fill="none" stroke="#C2C2C8" stroke-width="6" stroke-linecap="round"
+        stroke-dasharray="2 10" opacity="0.9"/>
+
+  <!-- Título en blanco -->
+  <text x="118" y="300" font-family="Georgia, 'Times New Roman', serif"
+        font-size="64" font-weight="700" fill="#F5F5F6" letter-spacing="-1">
+    Sueño<tspan x="118" dy="78" font-size="76">Profundo</tspan>
+  </text>
+
+  <!-- Sub: promesa en blanco atenuado -->
+  <text x="122" y="430" font-family="Georgia, serif" font-size="26" fill="#B3B3B8">
+    Soltar el día. Dormir de un tirón.
+  </text>
+</svg>

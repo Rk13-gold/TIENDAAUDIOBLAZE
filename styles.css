@@ -328,6 +328,14 @@ a:hover { color: var(--terra); }
   background: var(--surface);
   border: 1px solid var(--arena);
   border-radius: var(--radius-md);
+  text-decoration: none;      /* el catálogo vive en <a> (enlace al pack) */
+  color: inherit;
+  transition: border-color var(--motion-fade), transform var(--motion-fade);
+}
+.pack-row:hover {
+  border-color: var(--terra);
+  transform: translateY(-1px);
+  color: inherit;
 }
 .pack-row img {
   width: 64px; height: 64px;
@@ -402,20 +410,24 @@ a:hover { color: var(--terra); }
 }
 
 /* ------------------------------------------------------------
-   Checkout del teléfono (T3, opcional)
+   Campo genérico (login/registro/mis-packs). El checkout de teléfono
+   queda como alias para no tocar index.html (T5 legacy).
    ------------------------------------------------------------ */
+.field,
 .phone-field {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
   margin: var(--sp-3) 0;
-  max-width: 320px;
+  max-width: 360px;
 }
+.field label,
 .phone-field label {
   font-size: var(--fs-small);
   font-weight: 600;
   color: var(--ink);
 }
+.field input,
 .phone-field input {
   padding: 12px 14px;
   min-height: 48px;
@@ -426,14 +438,156 @@ a:hover { color: var(--terra); }
   font-size: 1rem;
   color: var(--ink);
 }
+.field input:focus-visible,
 .phone-field input:focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
+.field input[aria-invalid="true"],
+.phone-field input[aria-invalid="true"] {
+  border-color: var(--status-err);
+}
+.field .hint,
 .phone-field .hint { font-size: var(--fs-micro); color: var(--muted); }
 
-/* Botón PayPal: contenedor seguro (el iframe mide alturas) */
-#paypal-button-container { margin-top: var(--sp-2); }
+/* ------------------------------------------------------------
+   Nav de sesión en el header (login/registro/mis packs)
+   ------------------------------------------------------------ */
+.auth-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-left: var(--sp-1);
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--arena);
+}
+.auth-nav .btn {
+  padding: 8px 14px;
+  min-height: 40px;
+  font-size: 0.95rem;
+}
+.auth-nav .link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 4px 8px;
+}
+.auth-nav .link:hover { color: var(--terra); text-decoration: underline; text-underline-offset: 4px; }
+
+/* ------------------------------------------------------------
+   Tarjetas de autenticación (registro.html / login.html)
+   ------------------------------------------------------------ */
+.auth-section {
+  max-width: 480px;
+  margin-inline: auto;
+  padding: var(--sp-5) 0;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--arena);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+}
+.auth-card h1 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: var(--fs-label);
+  color: var(--pine);
+  margin: 0 0 var(--sp-1);
+}
+.auth-card > p {
+  margin: 0 0 var(--sp-2);
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+.auth-card .form-error {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--status-err);
+  background: rgba(255, 77, 77, 0.10);
+  border-radius: var(--radius-sm);
+  color: var(--status-err);
+  font-size: var(--fs-small);
+}
+.auth-card .form-error[hidden] { display: none; }
+.auth-nav-whoami {
+  margin: var(--sp-3) 0 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--arena);
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+.auth-nav-whoami strong { color: var(--ink); font-weight: 600; }
+.auth-nav-whoami button.btn {
+  margin: var(--sp-2) 0 0;
+  padding: 8px 14px;
+  min-height: 40px;
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------
+   CTA de compra + panel de pago (landings y hero)
+   ------------------------------------------------------------ */
+.login-cta {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--arena);
+  border-radius: var(--radius-md);
+  max-width: 360px;
+}
+.login-cta p { margin: 0 0 var(--sp-2); color: var(--ink); font-size: var(--fs-small); }
+.login-cta .btn { width: 100%; }
+
+.pay-card {
+  background: var(--surface);
+  border: 1px solid var(--arena);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  max-width: 360px;
+}
+.pay-row {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
+.pay-row img {
+  width: 72px; height: 90px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.pay-row .pay-info { min-width: 0; }
+.pay-row .pay-name { font-weight: 600; color: var(--ink); line-height: 1.25; }
+.pay-row .pay-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--price);
+}
+.pay-divider {
+  height: 1px;
+  background: var(--arena);
+  margin: var(--sp-3) 0;
+}
+#paypal-button-container { margin-top: 0; }
+
+/* Botón PayPal: halo sutil alrededor del dorado (sin glow rojo,
+   que chocaría con el amarillo del botón de PayPal). */
+.pay-card #paypal-button-container {
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+}
+
+.pay-note {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+.pay-note svg { flex: none; }
 
 /* ------------------------------------------------------------
    Responsive (Pass 6): columna única + CTA sticky en móvil
@@ -441,6 +595,18 @@ a:hover { color: var(--terra); }
 @media (max-width: 720px) {
   .container { padding-inline: var(--sp-3); }  /* más margen útil en móvil */
   .header-links { flex-wrap: wrap; gap: var(--sp-2) var(--sp-3); }
+  /* En móvil el seccionador del nav de sesión sobra: se iguala al nav. */
+  .auth-nav {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+    padding-top: var(--sp-1);
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .auth-section { padding: var(--sp-4) 0; }
+  .auth-card { padding: var(--sp-3); }
+  .pay-card { max-width: 100%; }
   .hero {
     grid-template-columns: 1fr;
     gap: var(--sp-4);

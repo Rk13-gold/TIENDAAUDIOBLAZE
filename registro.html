@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Crea tu cuenta gratis en TiendaAudioBlaze para comprar packs de audio de psicología.">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <title>Crear cuenta — TiendaAudioBlaze</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- SDK de supabase-js v2 (carga directa aquí: el form lo necesita ya). -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="site-header container" role="banner">
+    <p class="brand">
+      <img src="assets/logo.png" alt="" width="56" height="56">
+      <span class="brand-text">TiendaAudioBlaze<small>audio de psicología</small></span>
+    </p>
+    <nav class="header-links" aria-label="Navegación principal">
+      <a href="index.html#catalogo">Catálogo</a>
+      <a href="mis-packs.html">Mis packs</a>
+      <span class="auth-nav" id="auth-nav"></span>
+    </nav>
+  </header>
+
+  <main role="main" class="container">
+    <section class="auth-section" aria-labelledby="registro-titulo">
+      <div class="auth-card">
+        <h1 id="registro-titulo">Crea tu cuenta</h1>
+        <p>Tu cuenta guarda los packs que compras. Son 20 segundos.</p>
+
+        <form id="registro-form" novalidate>
+          <div class="field">
+            <label for="reg-name">Nombre <span style="font-weight:400">(opcional)</span></label>
+            <input type="text" id="reg-name" name="full_name" autocomplete="name"
+                   placeholder="Tu nombre">
+          </div>
+
+          <div class="field">
+            <label for="reg-email">Correo</label>
+            <input type="email" id="reg-email" name="email" autocomplete="email"
+                   placeholder="tu@correo.com" required>
+          </div>
+
+          <div class="field">
+            <label for="reg-password">Contraseña</label>
+            <input type="password" id="reg-password" name="password" minlength="6"
+                   autocomplete="new-password" placeholder="Mínimo 6 caracteres" required>
+            <span class="hint">La necesitas para entrar y ver tus packs.</span>
+          </div>
+
+          <button class="btn btn-primary" id="registro-btn" type="submit"
+                  style="width:100%;min-height:48px">Crear cuenta</button>
+
+          <p class="form-error" id="registro-error" hidden role="alert"></p>
+        </form>
+
+        <div class="auth-nav-whoami">
+          ¿Ya tienes cuenta?
+          <a href="login.html" id="to-login">Entra aquí</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>© 2026 TiendaAudioBlaze · <a href="refunds.html">Política de reembolso</a></p>
+      <p><a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    // Preserva el destino de la URL actual al saltar a "Entra aquí".
+    (function () {
+      var p = new URLSearchParams(window.location.search);
+      var n = p.get('next') || sessionStorage.getItem('auth.next') || 'index.html';
+      var a = document.getElementById('to-login');
+      if (a) a.href = 'login.html?next=' + encodeURIComponent(n);
+    })();
+  </script>
+</body>
+</html>

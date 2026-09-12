@@ -11,6 +11,7 @@ export interface PackRow {
 }
 
 export interface NewOrder {
+  user_id: string | null;       // cuenta Supabase Auth que compró (nullable: reconciliaciones manuales)
   paypal_order_id: string;
   pack_id: string | null;
   buyer_name: string | null;
