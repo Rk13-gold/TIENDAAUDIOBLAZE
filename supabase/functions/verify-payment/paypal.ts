@@ -36,6 +36,11 @@ export function paypalBase(): string {
 // petición. El isolate de Deno se reutiliza entre invocaciones cercanas.
 let cached: { token: string; expiresAt: number } | null = null;
 
+/** Solo para tests: reinicia el cache de token (determinismo entre tests del mismo proceso). */
+export function _resetTokenCache(): void {
+  cached = null;
+}
+
 export async function getAccessToken(): Promise<string> {
   if (cached && Date.now() < cached.expiresAt) return cached.token;
 

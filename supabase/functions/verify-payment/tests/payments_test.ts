@@ -7,6 +7,7 @@
 
 import { assert, assertEquals, assertNotEquals } from 'jsr:@std/assert';
 import handler from '../index.ts';
+import { _resetTokenCache } from '../paypal.ts';
 
 // --- stubs ---------------------------------------------------------------
 
@@ -41,6 +42,10 @@ const ENV = {
   CORS_ORIGIN: '*',
 };
 
+// Deno 2 eliminó el campo `env` de Deno.TestDefinition; se inyecta el
+// entorno programáticamente (la tarea `test` ya corre con --allow-env).
+for (const [k, v] of Object.entries(ENV)) Deno.env.set(k, v);
+
 function approvedOrder(packId = 'ansiedad-01', value = '27.00'): Record<string, unknown> {
   return {
     id: 'ORDER-1',
@@ -56,8 +61,7 @@ const cases: Array<{ name: string; env?: Record<string, string> }> = [];
 
 Deno.test({
   name: '1/12 falta order_id -> 400',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => okJson(url === 'x' ? {} : {}));
     const res = await handler(new Request('https://fn/verify-payment', { method: 'POST', body: JSON.stringify({}) }));
     assertEquals(res.status, 400);
@@ -67,8 +71,7 @@ Deno.test({
 
 Deno.test({
   name: '2/12 orden no aprobada -> 400',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(() => okJson({ ...approvedOrder(), status: 'VOIDED' }));
     const res = await handler(new Request('https://fn', { method: 'POST', body: JSON.stringify({ order_id: 'X' }) }));
     assertEquals(res.status, 400);
@@ -78,8 +81,7 @@ Deno.test({
 
 Deno.test({
   name: '3/12 importe NO coincide con catálogo -> 400 (anti-fraude 1B)',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/')) return okJson({ ...approvedOrder('ansiedad-01', '1.00') }); // $1 ≠ $27
@@ -93,8 +95,7 @@ Deno.test({
 
 Deno.test({
   name: '4/12 pack no existe en BD -> 400',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/')) return okJson(approvedOrder('pack-inexistente'));
@@ -108,8 +109,7 @@ Deno.test({
 
 Deno.test({
   name: '5/12 email del comprador vacío -> 400 (nunca del formulario)',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/')) {
@@ -125,8 +125,7 @@ Deno.test({
 
 Deno.test({
   name: '6/12 flujo feliz: captura + insert + notify, respuesta ok',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     let captureCalled = false;
     let notifyCalled = false;
     const restore = installFetch(({ url }) => {
@@ -154,8 +153,7 @@ Deno.test({
 
 Deno.test({
   name: '7/12 reintento idempotente: order ya capturada -> exito, no duplica',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/') && url.endsWith('/capture')) {
@@ -175,8 +173,7 @@ Deno.test({
 
 Deno.test({
   name: '8/12 insert 409 (duplicado) -> respuesta ok pero NO re-notifica',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     let notifyCount = 0;
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
@@ -197,8 +194,7 @@ Deno.test({
 
 Deno.test({
   name: '9/12 Telegram caído -> notificación error, la venta SIGUE ok',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) return okJson({ access_token: 't', expires_in: 3500 });
       if (url.includes('/v2/checkout/orders/') && url.endsWith('/capture')) return new Response('{}', { status: 201 });
@@ -218,8 +214,8 @@ Deno.test({
 
 Deno.test({
   name: '10/12 token OAuth se cachea: una sola llamada para 2 requests',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
+    _resetTokenCache(); // la caché OAuth es a nivel de módulo: empieza en estado limpio
     let oauthCalls = 0;
     const restore = installFetch(({ url }) => {
       if (url.includes('/v1/oauth2/token')) { oauthCalls += 1; return okJson({ access_token: 't', expires_in: 3500 }); }
@@ -240,8 +236,7 @@ Deno.test({
 
 Deno.test({
   name: '11/12 método GET -> 405',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const res = await handler(new Request('https://fn', { method: 'GET' }));
     assertEquals(res.status, 405);
   },
@@ -249,8 +244,7 @@ Deno.test({
 
 Deno.test({
   name: '12/12 POST body no JSON -> 400',
-  env: ENV,
-  fn: async () => {
+    fn: async () => {
     const res = await handler(new Request('https://fn', { method: 'POST', body: 'no-json{' }));
     assertEquals(res.status, 400);
   },
