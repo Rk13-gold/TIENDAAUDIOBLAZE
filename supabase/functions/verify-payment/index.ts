@@ -183,3 +183,8 @@ async function updateNotifyStatus(orderId: string, status: string): Promise<void
     // best-effort
   }
 }
+
+// Registro del listener para el runtime actual de Supabase Edge Functions.
+// El export default (usado por los tests) ya NO registra el servidor: sin esta
+// línea el worker carga la función pero nunca responde (timeout HTTP 000).
+Deno.serve(handler);
