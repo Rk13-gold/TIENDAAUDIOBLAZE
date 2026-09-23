@@ -22,7 +22,27 @@ const CONFIG = {
   CURRENCY: 'USD',                    // moneda de la tienda (precios en $)
   // Tiempo máximo de espera de la Edge Function antes de mostrar error.
   EDGE_TIMEOUT_MS: 15000,
+
+  // --- PayPal: client-id según entorno (sandbox vs live) ------------------
+  // Sandbox: desarrollo local y GitHub Pages (testing)
+  // Live: dominio personalizado en producción
+  PAYPAL_CLIENT_ID_SANDBOX: 'AdDqsKZIajyi2rT-spC0LL72qguV5t7Am8GnSSMAj_Rt17aFhjAAmYs2GB9INr4Fj2HdYGeC0lV08d3J',
+  PAYPAL_CLIENT_ID_LIVE: '__REEMPLAZAR_CON_LIVE_CLIENT_ID__',
 };
+
+// --- Detección de entorno ----------------------------------------------------
+// GitHub Pages y localhost → sandbox. Dominio personalizado → live.
+const ENV = (() => {
+  const host = window.location.hostname;
+  const isDev = host === 'localhost' || host === '127.0.0.1' || host.includes('github.io');
+  return {
+    isProduction: !isDev,
+    isSandbox: isDev,
+    paypalClientId: isDev
+      ? CONFIG.PAYPAL_CLIENT_ID_SANDBOX
+      : CONFIG.PAYPAL_CLIENT_ID_LIVE,
+  };
+})();
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -350,6 +370,34 @@ async function submitOrderToEdge(orderId, buyerPhone) {
 }
 
 /* ------------------------------------------------------------
+   PayPal SDK: carga dinámica con client-id según entorno
+   ------------------------------------------------------------ */
+let _paypalLoading = false;
+let _paypalLoaded = false;
+let _paypalError = false;
+
+function loadPayPalSDK() {
+  return new Promise((resolve, reject) => {
+    if (_paypalLoaded) { resolve(); return; }
+    if (_paypalError) { reject(new Error('PayPal SDK ya falló antes')); return; }
+    if (_paypalLoading) {
+      // Ya está cargándose; esperar a que termine
+      const check = setInterval(() => {
+        if (_paypalLoaded) { clearInterval(check); resolve(); }
+        if (_paypalError) { clearInterval(check); reject(new Error('PayPal SDK falló')); }
+      }, 200);
+      return;
+    }
+    _paypalLoading = true;
+    const s = document.createElement('script');
+    s.src = `https://www.paypal.com/sdk/js?client-id=${ENV.paypalClientId}&components=buttons&currency=USD`;
+    s.onload = () => { _paypalLoaded = true; _paypalLoading = false; resolve(); };
+    s.onerror = () => { _paypalError = true; _paypalLoading = false; reject(new Error('PayPal SDK no disponible')); };
+    document.head.appendChild(s);
+  });
+}
+
+/* ------------------------------------------------------------
    Panel de compra (gate de cuenta + PayPal pro)
    ------------------------------------------------------------ */
 async function renderPurchasePanel(pack) {
@@ -387,7 +435,10 @@ async function renderPurchasePanel(pack) {
     return;
   }
 
-  if (typeof paypal === 'undefined' || typeof paypal.Buttons !== 'function') {
+  // Cargar SDK de PayPal dinámicamente con el client-id del entorno
+  try {
+    await loadPayPalSDK();
+  } catch {
     renderDemoButton(pack);
     return;
   }
