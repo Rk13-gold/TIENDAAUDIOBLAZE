@@ -299,7 +299,22 @@ function setSubmitting(on) {
 
 function showPayError() {
   const el = $('#pay-error');
-  if (el) el.hidden = false;
+  if (el) {
+    if (el.dataset.originalHtml) {
+      el.innerHTML = el.dataset.originalHtml;
+      delete el.dataset.originalHtml;
+    }
+    el.hidden = false;
+  }
+}
+
+function showCancelMsg() {
+  const el = $('#pay-error');
+  if (el) {
+    el.dataset.originalHtml = el.innerHTML;
+    el.innerHTML = '<span style="color:var(--muted)">Pago cancelado por el usuario.</span>';
+    el.hidden = false;
+  }
 }
 
 /* ------------------------------------------------------------
@@ -431,6 +446,7 @@ async function renderPurchasePanel(pack) {
 
     onCancel() {
       setSubmitting(false);
+      showCancelMsg();
     },
   }).render('#paypal-button-container')
     .catch((err) => {
