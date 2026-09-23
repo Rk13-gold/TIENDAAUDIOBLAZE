@@ -4,13 +4,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="Tus packs de audio comprados en TiendaAudioBlaze.">
+  <meta name="description" content="Tus packs de audio comprados en TiendaAudioBlaze. Escucha aquí tus contenidos.">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <title>Mis packs — TiendaAudioBlaze</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ============================================================
+       Player-specific styles (mobile-first)
+       Tokens reutilizados de styles.css
+       ============================================================ */
+
+    .player-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--sp-3) var(--sp-2) var(--sp-5);
+    }
+
+    .player-page h1 {
+      font-family: var(--font-display);
+      font-weight: 560;
+      font-size: var(--fs-h2);
+      color: var(--pine);
+      margin: 0 0 var(--sp-1);
+    }
+
+    .player-page .player-subtitle {
+      color: var(--muted);
+      font-size: var(--fs-small);
+      margin: 0 0 var(--sp-3);
+    }
+
+    /* --- Watermark --- */
+    .watermark-overlay {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--sp-1) var(--sp-2);
+      background: var(--surface);
+      border-top: 1px solid var(--arena);
+      text-align: center;
+      font-size: var(--fs-micro);
+      color: var(--pine);
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 999;
+      line-height: 1.4;
+    }
+
+    /* --- Audio player bar --- */
+    .audio-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--arena);
+      padding: var(--sp-2) 0;
+      margin: 0 calc(-1 * var(--sp-2)) var(--sp-3);
+      padding-left: var(--sp-2);
+      padding-right: var(--sp-2);
+    }
+
+    .audio-bar audio {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* --- Pack sections --- */
+    .pack-section {
+      margin: 0 0 var(--sp-4);
+    }
+
+    .pack-section-title {
+      font-family: var(--font-display);
+      font-weight: 560;
+      font-size: var(--fs-label);
+      color: var(--pine);
+      margin: 0 0 var(--sp-2);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .pack-section-title .pack-cover-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--arena);
+    }
+
+    /* --- Track list --- */
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+    }
+
+    .track-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      width: 100%;
+      padding: var(--sp-2);
+      border: 1px solid var(--arena);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: var(--fs-small);
+      color: var(--ink);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .track-btn:hover {
+      background: var(--arena);
+    }
+
+    .track-btn:focus-visible {
+      outline: 2px solid var(--terra);
+      outline-offset: 2px;
+    }
+
+    .track-btn.active {
+      border-color: var(--moss);
+      background: color-mix(in srgb, var(--moss) 8%, var(--surface));
+    }
+
+    .track-btn .track-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--arena);
+      font-size: var(--fs-micro);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .track-btn.active .track-number {
+      background: var(--moss);
+      color: white;
+    }
+
+    .track-btn .track-title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-btn .track-duration {
+      color: var(--muted);
+      font-size: var(--fs-micro);
+      flex-shrink: 0;
+    }
+
+    .track-btn .play-icon {
+      flex-shrink: 0;
+      color: var(--moss);
+      width: 20px;
+      height: 20px;
+    }
+
+    /* --- States --- */
+    .empty-state,
+    .error-state {
+      text-align: center;
+      padding: var(--sp-5) 0;
+      color: var(--muted);
+    }
+
+    .empty-state .btn,
+    .error-state .btn {
+      margin-top: var(--sp-3);
+    }
+
+    .error-state .btn {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* --- Accordion for packs on mobile --- */
+    @media (max-width: 480px) {
+      .player-page {
+        padding: var(--sp-2) var(--sp-1) var(--sp-5);
+      }
+      .track-btn {
+        padding: var(--sp-1) var(--sp-2);
+      }
+    }
+
+    /* Disclaimer psicoeducativo */
+    .player-disclaimer {
+      font-size: var(--fs-micro);
+      color: var(--muted);
+      margin-top: var(--sp-4);
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header container" role="banner">
@@ -25,26 +225,56 @@
     </nav>
   </header>
 
-  <main role="main" class="container">
-    <section class="auth-section" aria-labelledby="mis-packs-titulo" style="max-width:680px">
-      <h1 id="mis-packs-titulo" style="font-family:var(--font-display);font-weight:560;font-size:var(--fs-label);color:var(--pine);margin:0 0 var(--sp-2)">Mis packs</h1>
-      <p style="color:var(--muted);font-size:var(--fs-small);margin:0 0 var(--sp-3)">
-        Los packs que compraste con esta cuenta. El enlace de descarga llega a tu correo; si no lo ves, escríbenos.
-      </p>
+  <main role="main" class="player-page">
+    <h1>Mis packs</h1>
+    <p class="player-subtitle">
+      Tus audios comprados. Escúchalos aquí cuando quieras.
+    </p>
 
-      <div id="mis-packs">
-        <p class="promise">Cargando tus packs…</p>
-      </div>
-    </section>
+    <!-- Packs y reproductor se inyectan aquí desde packs-player.js -->
+    <div id="mis-packs">
+      <p class="promise">Cargando tus packs…</p>
+    </div>
+
+    <!-- Disclaimer psicoeducativo (Regla de Oro #3) -->
+    <div class="player-disclaimer">
+      <p>Descargo de responsabilidad: Los packs de audio están diseñados para fines de bienestar y educación psicológica. No sustituyen terapia, diagnóstico o tratamiento médico profesional. Si tienes alguna condición de salud mental o física, consulta a un profesional calificado antes de usar estos materiales. El uso de este contenido es bajo tu propia responsabilidad.</p>
+    </div>
+
+    <!-- Telegram: únete a la sala gratuita (P4) -->
+    <div class="telegram-card" style="margin:var(--sp-3) 0;padding:var(--sp-3);background:var(--surface);border:1px solid var(--arena);border-radius:var(--radius-md);text-align:center">
+      <p style="margin:0 0 var(--sp-2);color:var(--pine);font-weight:600;font-size:var(--fs-label);font-family:var(--font-display)">Únete a la sala de Telegram</p>
+      <p style="margin:0 0 var(--sp-2);color:var(--muted);font-size:var(--fs-small)">
+        Audios gratis, nota de voz diaria y acompañamiento. Todo en nuestra sala gratuita.
+      </p>
+      <!-- TODO: Reemplazar con URL real del canal de Telegram -->
+      <a class="btn btn-plan" href="#"
+         target="_blank" rel="noopener noreferrer"
+         style="font-size:var(--fs-small)"
+         aria-label="Unirme al canal de Telegram (se abre en una ventana nueva)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align:middle;margin-right:4px">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm3.065 4.854L7.043 9.27c-.447.198-.41.714.038.877l2.374.843 1.357 4.397a.24.24 0 0 0 .372.14l1.896-1.446 2.584 2.13c.25.216.624.03.52-.322L15.9 6.223c-.134-.561-.635-.581-.891-.37z"/>
+        </svg>
+        Unirme al canal
+      </a>
+    </div>
   </main>
+
+  <!-- Marca de agua fija con email del usuario -->
+  <div class="watermark-overlay" id="watermark"></div>
 
   <footer class="site-footer" role="contentinfo">
     <div class="container">
-      <p>© 2026 TiendaAudioBlaze · <a href="refunds.html">Política de reembolso</a></p>
+      <p>© 2026 AudioBlaze. Todos los derechos reservados.</p>
       <p><a href="mailto:hola@tiendaaudioblaze.com">hola@tiendaaudioblaze.com</a></p>
+      <p class="footer-disclaimer">
+        AudioBlaze ofrece contenido psicoeducativo y herramientas de bienestar emocional. Nuestros audios y materiales NO sustituyen terapia profesional, diagnóstico médico ni tratamiento psicológico. Si experimentas malestar persistente, consulta con un profesional de salud mental cualificado.
+      </p>
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="app.js"></script>
+  <script src="packs-player.js"></script>
 </body>
 </html>

@@ -408,6 +408,13 @@ a:hover { color: var(--terra); }
   gap: var(--sp-3);
   justify-content: space-between;
 }
+.site-footer .footer-disclaimer {
+  width: 100%;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+  margin-top: var(--sp-2);
+  line-height: 1.4;
+}
 
 /* ------------------------------------------------------------
    Campo genérico (login/registro/mis-packs). El checkout de teléfono
@@ -463,7 +470,7 @@ a:hover { color: var(--terra); }
 }
 .auth-nav .btn {
   padding: 8px 14px;
-  min-height: 40px;
+  min-height: 44px;
   font-size: 0.95rem;
 }
 .auth-nav .link {
@@ -522,7 +529,7 @@ a:hover { color: var(--terra); }
 .auth-nav-whoami button.btn {
   margin: var(--sp-2) 0 0;
   padding: 8px 14px;
-  min-height: 40px;
+  min-height: 44px;
   font-size: 0.95rem;
 }
 

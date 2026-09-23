@@ -409,6 +409,11 @@ async function renderPurchasePanel(pack) {
       $('#pay-error').hidden = true;
       const phone = $('#buyer-phone')?.value.trim() || null;
       try {
+        // Guardar el nombre del pack para mostrarlo en gracias.html
+        const pack = heroPack();
+        if (pack && pack.name) {
+          sessionStorage.setItem('lastPackName', pack.name);
+        }
         await submitOrderToEdge(data.orderID, phone);
         window.location.href = PREFIX + 'gracias.html';
       } catch (e) {
@@ -489,10 +494,15 @@ function bindAuthForms() {
       try {
         const client = await getAuthClient();
         if (!client) throw new Error('Supabase no disponible ahora mismo.');
+        const phone = $('#reg-phone')?.value.trim() || null;
+        const userData = fullName ? { full_name: fullName } : {};
+        if (phone) {
+          userData.phone = phone;
+        }
         const { data, error } = await client.auth.signUp({
           email,
           password,
-          options: fullName ? { data: { full_name: fullName } } : {},
+          options: userData ? { data: userData } : undefined,
         });
         if (error) throw error;
         // si confirm email está activo, la sesión no existe aún → se avisa

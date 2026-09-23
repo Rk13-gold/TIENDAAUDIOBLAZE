@@ -41,13 +41,44 @@ HTML/JS:
 - `TELEGRAM_BOT_TOKEN` — token del bot
 - `TELEGRAM_CHAT_ID` — chat donde notifica
 - `SUPABASE_SERVICE_ROLE_KEY` — clave service-role (solo servidor)
+- `CORS_ORIGIN` — dominio del front para CORS (ver más abajo)
 
 El `client-id` de PayPal que se monta en `app.js` es público.
 
 ## Arranque local
 
 1. Instalar el CLI de Supabase: `npm i -g supabase`.
-2. `supabase link --project-ref <id>` y `supabase functions secrets set PAYPAL_CLIENT_SECRET ...`.
-3. Desplegar la función: `supabase functions deploy verify-payment`.
-4. Abrir `index.html` en local (el catálogo se sirve desde Supabase; el `anon` key
+2. `supabase link --project-ref <id>`.
+3. Configurar secrets:
+   ```
+   supabase secrets set PAYPAL_CLIENT_SECRET=...
+   supabase secrets set TELEGRAM_BOT_TOKEN=...
+   supabase secrets set TELEGRAM_CHAT_ID=...
+   supabase secrets set CORS_ORIGIN=https://rk13-gold.github.io
+   ```
+4. Desplegar funciones:
+   ```
+   supabase functions deploy verify-payment
+   supabase functions deploy get-pack-audio --no-verify-jwt
+   ```
+5. Aplicar migraciones: `supabase db push`.
+6. Abrir `index.html` en local (el catálogo se sirve desde Supabase; el `anon` key
    y la URL del proyecto van en `app.js`).
+
+## Reglas de negocio: Audio gratuito vs. audio de pago
+
+| Tipo | Dónde se entrega | Propósito | Protección |
+|---|---|---|---|
+| **Audio gratuito** | Telegram | Muestras para probar antes de comprar (viral) | Sin DRM — solo muestras, nunca packs completos |
+| **Audio de pago** | Web + Supabase | Entrega del pack completo al comprador | RLS (row-level security) + signed URLs expirables |
+
+Principios:
+- **Free = Telegram**. Las muestras gratuitas viven en el canal de Telegram. No hay registro ni autenticación para escucharlas.
+- **Paid = Web + Supabase**. El pack completo se entrega al comprador validado mediante enlaces firmados (signed URLs) con expiración de 300 segundos, autorizados por la Edge Function `get-pack-audio` que verifica la compra via RLS.
+- **No se suben packs completos a Telegram**. Solo muestras representativas de 2 a 3 minutos. Esto es una regla de negocio irreversible: el audio gratuito es gancho, no sustituto.
+
+Canales de presencia:
+- **index.html** + todas las páginas de pack: bloque "Prueba antes de comprar" con enlace al canal.
+- **gracias.html** + **mis-packs.html**: tarjeta "Únete a la sala de Telegram" como acompañamiento post-compra.
+
+Ver protocolo detallado en [`content/telegram-free-audio.md`](content/telegram-free-audio.md).
